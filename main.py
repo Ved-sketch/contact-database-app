@@ -1,0 +1,41 @@
+# class Info:
+#     def __init__(self,name,address,email,phone):
+#         self.name = name
+#         self.address = address
+#         self.email = email
+#         self.phone = phone
+#
+#
+# person1 = Info("Alex","Pahad ke piche","Alex@yahoo.com",999555666)
+# print(person1.name)
+
+import tkinter as tk
+from tkinter import messagebox, Label
+
+
+class MyGUI:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title("Records")
+
+        # centring the opening window
+        width = 800
+        height = 600
+
+        # get screen dimensions
+        screen_width = self.root.winfo_screenmmwidth()
+        screen_height = self.root.winfo_screenheight()
+
+        x = (screen_width - width) // 2
+        y = (screen_height - height) // 2
+
+        self.root.geometry(f"{width}x{height}+{x+600}+{y}")
+
+        self.label = tk.Label(self.root, text="Your Entries",font=('Times New Roman',16))
+        self.label.pack(padx=10,pady=10)
+
+        self.root.mainloop()
+
+
+
+MyGUI()
