@@ -34,6 +34,21 @@ class MyGUI:
         self.label = tk.Label(self.root, text="Your Entries",font=('Times New Roman',16))
         self.label.pack(padx=10,pady=10)
 
+        # creating a frame container
+        self.tableFrame = tk.Frame(self.root)
+        self.column_headings = ['Name','Phone','Residence','Email']
+
+        for i in range(0,4):
+            self.tableFrame.columnconfigure(i,weight=1)
+
+        for column_heading, heading_text in enumerate(self.column_headings):
+            self.table_headings = tk.Label(self.tableFrame, text=heading_text,font=('Times New Roman',16))
+            self.table_headings.grid(row=0,column=column_heading,sticky="we")
+
+
+        self.tableFrame.pack(fill='x')
+
+
         self.add_button = tk.Button(self.root,text="Add",font=('Arial',13))
         self.add_button.pack()
 
