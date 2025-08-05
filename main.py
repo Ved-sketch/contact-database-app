@@ -34,6 +34,9 @@ class MyGUI:
         self.label = tk.Label(self.root, text="Your Entries",font=('Times New Roman',16))
         self.label.pack(padx=10,pady=10)
 
+        self.add_button = tk.Button(self.root,text="Add",font=('Arial',13))
+        self.add_button.pack()
+
         self.root.mainloop()
 
 
