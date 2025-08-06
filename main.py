@@ -38,19 +38,34 @@ class MyGUI:
         self.tableFrame = tk.Frame(self.root)
         self.column_headings = ['Name','Phone','Residence','Email']
 
+        # creating 4 columns
         for i in range(0,4):
             self.tableFrame.columnconfigure(i,weight=1)
 
+        # creating the headings
         for column_heading, heading_text in enumerate(self.column_headings):
-            self.table_headings = tk.Label(self.tableFrame, text=heading_text,font=('Times New Roman',16))
-            self.table_headings.grid(row=0,column=column_heading,sticky="we")
-
-
+            table_headings = tk.Label(self.tableFrame, text=heading_text,font=('Times New Roman',16),borderwidth=1,relief='solid')
+            table_headings.grid(row=0,column=column_heading,padx=1,pady=1,sticky="we")
         self.tableFrame.pack(fill='x')
 
+        # first creating a frame to hold the Entry
+        self.EntryFrame = tk.Frame(self.root)
 
-        self.add_button = tk.Button(self.root,text="Add",font=('Arial',13))
-        self.add_button.pack()
+        # creating 4 entries
+        for i, column_heading in enumerate(self.column_headings):
+            self.entry_label = tk.Label(self.EntryFrame, text=column_heading,font=('Times New Roman',14))
+            self.entry_label.grid(row = i,column=0,padx=1,pady=1,sticky="we")
+
+            entry = tk.Entry(self.EntryFrame,borderwidth=1,relief='solid',width=30)
+            entry.grid(row=i,column=1,padx=1,pady=1)
+        self.EntryFrame.pack(side='bottom',fill='x',pady=20)
+
+        self.addBtn = tk.Button(self.EntryFrame, text='Add', font=('Times New Roman',16))
+        self.addBtn.grid(row=1,column=2,padx = 20)
+
+        # creating the input fields
+
+        
 
         self.root.mainloop()
 
