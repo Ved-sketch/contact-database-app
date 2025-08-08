@@ -1,18 +1,8 @@
-# class Info:
-#     def __init__(self,name,address,email,phone):
-#         self.name = name
-#         self.address = address
-#         self.email = email
-#         self.phone = phone
-#
-#
-# person1 = Info("Alex","Pahad ke piche","Alex@yahoo.com",999555666)
-# print(person1.name)
-
+import sqlite3
 import tkinter as tk
 from tkinter import messagebox, Label
 
-from Demos.SystemParametersInfo import new_value
+from pyautogui import PRIMARY
 
 
 class MyGUI:
@@ -69,14 +59,30 @@ class MyGUI:
         self.addBtn = tk.Button(self.EntryFrame, text='Add', font=('Times New Roman',16),command=self.adding_inputs)
         self.addBtn.grid(row=1,column=2,padx = 20)
 
+        # adding the database functionality
+        self.conn = sqlite3.connect("E:\Codes\Python\Basic DataBase\ records.db") # opening the connection to the database
+        cursor = self.conn.cursor()
+        cursor.execute(
+            '''CREATE TABLE IF NOT EXISTS records(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                phone TEXT,
+                residence TEXT,
+                email TEXT
+            );'''
+        )
+        self.conn.commit()
+
+
         self.root.mainloop()
+        self.conn.close()
 
     def empty_fields(self):
         for entry in self.input_fields:
             if entry.get().strip() == "":
                 messagebox.showwarning(title="Warning", message="Please fill all the information")
                 return True
-            return False
+        return False
 
     def adding_inputs(self):
         if self.empty_fields():
@@ -90,9 +96,19 @@ class MyGUI:
                 new_entry.grid(row=self.number_of_rows,column=i,padx=1,pady=1,sticky="we")
             self.number_of_rows = self.number_of_rows+1
 
+            # adding inputs into the database
+            cursor = self.conn.cursor()
+            values = [entry.get().strip() for entry in self.input_fields]
+            cursor.execute('''
+                INSERT INTO records (name,phone,residence,email)
+                VALUES (?,?,?,?)
+            ''',values)
+            self.conn.commit()
+
             # clearing all the fields
             for entry in self.input_fields:
                 entry.delete(0, tk.END)
+
 
 
 MyGUI()
