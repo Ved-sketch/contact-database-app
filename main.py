@@ -34,6 +34,20 @@ class MyGUI:
         for i in range(0,4):
             self.tableFrame.columnconfigure(i,weight=1)
 
+        # connecting code to the database
+        self.conn = sqlite3.connect("E:\Codes\Python\Basic DataBase\ records.db") # opening the connection to the database
+        cursor = self.conn.cursor()
+        cursor.execute(
+            '''CREATE TABLE IF NOT EXISTS records(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                phone TEXT,
+                residence TEXT,
+                email TEXT
+            );'''
+        )
+        self.conn.commit()
+
         # creating the headings
         for column_number, heading_text in enumerate(self.column_headings):
             table_headings = tk.Label(self.tableFrame, text=heading_text,font=('Times New Roman',16),borderwidth=1,relief='solid')
@@ -42,7 +56,9 @@ class MyGUI:
 
         self.number_of_rows = 1
 
-        # first creating a frame to hold the Entry
+        self.populate_the_ui() # adding the data of the database
+
+        # creating a frame to hold the Entry (input fields)
         self.EntryFrame = tk.Frame(self.root)
 
         # creating 4 entries
@@ -59,19 +75,6 @@ class MyGUI:
         self.addBtn = tk.Button(self.EntryFrame, text='Add', font=('Times New Roman',16),command=self.adding_inputs)
         self.addBtn.grid(row=1,column=2,padx = 20)
 
-        # adding the database functionality
-        self.conn = sqlite3.connect("E:\Codes\Python\Basic DataBase\ records.db") # opening the connection to the database
-        cursor = self.conn.cursor()
-        cursor.execute(
-            '''CREATE TABLE IF NOT EXISTS records(
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                phone TEXT,
-                residence TEXT,
-                email TEXT
-            );'''
-        )
-        self.conn.commit()
 
 
         self.root.mainloop()
@@ -109,6 +112,24 @@ class MyGUI:
             for entry in self.input_fields:
                 entry.delete(0, tk.END)
 
+    def populate_the_ui(self):
+        # loading the data in the database to the interface
+        cursor = self.conn.cursor()
+        cursor.execute('''
+                       SELECT name, phone, residence, email
+                       FROM records
+                       ORDER BY id
+                       ''')
+        data = cursor.fetchall()
+
+        for row in data:  # row = ("Alice", "123...", "Home", "email")
+            for col_index, value in enumerate(row):
+                new_entry = tk.Label(self.tableFrame, text=value,
+                                     font=('Times New Roman', 12),
+                                     borderwidth=1, relief='solid')
+                new_entry.grid(row=self.number_of_rows, column=col_index,
+                               padx=1, pady=1, sticky="we")
+            self.number_of_rows += 1
 
 
 MyGUI()
