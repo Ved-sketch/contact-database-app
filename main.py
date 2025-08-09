@@ -64,6 +64,15 @@ class MyGUI:
             self.input_fields.append(entry)  # storing the entry fields
             entry.grid(row=i, column=1, padx=1, pady=1)
 
+        # adding a menubar
+        # adding a menubar like the numerous tabs in notepad,excel etc
+        self.menubar = tk.Menu(self.root)
+        self.delete_menu = tk.Menu(self.menubar,tearoff=0)
+        self.delete_menu.add_command(label='Delete',command=self.delete_entry)
+        self.menubar.add_cascade(menu=self.delete_menu, label="File")  # adding the tabs to the menubar
+        self.root.config(menu=self.menubar)  # adding the menubar to the root
+
+
         self.addBtn = tk.Button(self.EntryFrame, text='Add', font=('Times New Roman', 16), command=self.adding_inputs)
         self.addBtn.grid(row=1, column=2, padx=20)
 
@@ -85,7 +94,6 @@ class MyGUI:
 
         label = tk.Label(self.root, text="Your Entries", font=('Times New Roman', 16))
         label.pack(padx=10, pady=10)
-
 
     def empty_fields(self):
         for entry in self.input_fields:
@@ -148,6 +156,61 @@ class MyGUI:
                 new_entry.grid(row=self.number_of_rows, column=col_index,
                                padx=1, pady=1, sticky="we")
             self.number_of_rows += 1
+
+    def delete_entry(self):
+        """Function to open the custom dialog box."""
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Delete Item")
+        dialog.geometry("300x100")
+        dialog.transient(self.root)  # Make the dialog a child of the main window
+        dialog.grab_set()  # Make it modal
+
+        # centring the dialog box
+
+        # get screen dimensions
+        screen_width = self.root.winfo_screenwidth()  # Fixed method name
+        screen_height = self.root.winfo_screenheight()  # Fixed method name
+
+        x = (screen_width - 100) // 2
+        y = (screen_height - 300) // 2
+
+        dialog.geometry(f"{300}x{100}+{x}+{y}")  # Fixed positioning
+
+        # Label and Entry widgets
+        tk.Label(dialog, text="Enter the id of entry: ").pack(pady=5)
+        entry = tk.Entry(dialog)
+        entry.pack(pady=5)
+
+        def on_ok():
+            index_to_delete = entry.get().strip()
+            if not index_to_delete.isdigit():
+                messagebox.showerror("Error", "Please enter a valid numeric ID.")
+                return
+
+            # delete the entry from database
+            cursor = self.conn.cursor()
+            cursor.execute("DELETE FROM records WHERE id = ?", (index_to_delete,))
+            self.conn.commit()
+
+            # update all the other rows in ui
+            # clearing the old widgets
+            for widget in self.tableFrame.winfo_children():
+                widget.destroy()
+
+            # adding the new widgets
+            self.populate_the_ui()
+            dialog.destroy()
+
+        def on_cancel():
+            dialog.destroy()
+
+        # OK and Cancel buttons
+        tk.Button(dialog, text="OK", command=on_ok).pack(side='left', padx=10)
+        tk.Button(dialog, text="Cancel", command=on_cancel).pack(side='right', padx=10)
+
+        # Set focus on the entry field
+        entry.focus_set()
+
 
 
 MyGUI()
