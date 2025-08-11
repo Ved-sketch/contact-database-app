@@ -18,9 +18,9 @@ class MyGUI:
         cursor.execute(
             '''CREATE TABLE IF NOT EXISTS records
                (
-                   id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   id INTEGER,
                    name TEXT NOT NULL,
-                   phone TEXT,
+                   phone TEXT UNIQUE,
                    residence TEXT,
                    email TEXT
                );'''
@@ -32,7 +32,7 @@ class MyGUI:
         self.tableFrame.pack(fill='x')
         self.column_headings = ['Id', 'Name', 'Phone', 'Residence', 'Email']
 
-        # creating 4 columns
+        # creating 5 columns
         for i in range(0, 5):
             self.tableFrame.columnconfigure(i, weight=1)
 
@@ -107,16 +107,17 @@ class MyGUI:
             return
         else:
 
-            # extracting the id number from the database so that entries can be numbered accordingly
+            # inserting the data into the database
             cursor = self.conn.cursor()
             values = [entry.get().strip() for entry in self.input_fields]
             cursor.execute('''
-                           INSERT INTO records (name, phone, residence, email)
-                           VALUES (?, ?, ?, ?)
-                           ''', values)
+                           INSERT INTO records (id,name, phone, residence, email)
+                           VALUES (?,?, ?, ?, ?)
+                           ''', [self.number_of_rows] + values)
             self.conn.commit()
 
             # get the ID of the newly inserted record
+
             new_id = cursor.lastrowid
 
             #   display the new record in the UI
@@ -126,7 +127,7 @@ class MyGUI:
                                 borderwidth=1, relief='solid')
             id_entry.grid(row=self.number_of_rows, column=0, padx=1, pady=1, sticky="we")
 
-            # push the info in the table
+            # push the info in the ui
             for i, entry in enumerate(self.input_fields):
                 value = entry.get()
                 new_entry = tk.Label(self.tableFrame, text=value, font=('Times New Roman', 12), borderwidth=1,
@@ -148,7 +149,19 @@ class MyGUI:
                        ''')
         data = cursor.fetchall()
 
-        for row in data:  # row = ("Alice", "123...", "Home", "email")
+        # creating 4 columns
+        for i in range(0, 5):
+            self.tableFrame.columnconfigure(i, weight=1)
+
+        # creating the headings
+        for column_number, heading_text in enumerate(self.column_headings):
+            table_headings = tk.Label(self.tableFrame, text=heading_text, font=('Times New Roman', 16), borderwidth=1,
+                                      relief='solid')
+            table_headings.grid(row=0, column=column_number, padx=1, pady=1, sticky="we")
+
+        self.number_of_rows = 1
+
+        for row in data:
             for col_index, value in enumerate(row):
                 new_entry = tk.Label(self.tableFrame, text=value,
                                      font=('Times New Roman', 12),
@@ -166,7 +179,6 @@ class MyGUI:
         dialog.grab_set()  # Make it modal
 
         # centring the dialog box
-
         # get screen dimensions
         screen_width = self.root.winfo_screenwidth()  # Fixed method name
         screen_height = self.root.winfo_screenheight()  # Fixed method name
@@ -187,9 +199,28 @@ class MyGUI:
                 messagebox.showerror("Error", "Please enter a valid numeric ID.")
                 return
 
-            # delete the entry from database
+            id_to_delete = int(index_to_delete)
             cursor = self.conn.cursor()
-            cursor.execute("DELETE FROM records WHERE id = ?", (index_to_delete,))
+
+            # check if the index exists before deleting
+            cursor.execute("SELECT COUNT(*) FROM records WHERE id = ?", (id_to_delete,))
+            if cursor.fetchone()[0] == 0:
+                messagebox.showerror("Error", f"No record found with ID {id_to_delete}.")
+                return
+            
+            # Delete the entry from the database
+            cursor.execute("DELETE FROM records WHERE id = ?", (id_to_delete,))
+
+            # Get all rows with an Id greater that the one deleted so that we can update them
+            cursor.execute("SELECT id FROM records WHERE id > ?", (id_to_delete,))
+            rows_to_update = cursor.fetchall()
+
+            # updating all the entries in the database first
+            for row in rows_to_update:
+                current_id = row[0]
+                new_id = current_id - 1
+                cursor.execute("UPDATE records SET id = ? WHERE id = ?", (new_id, current_id))
+
             self.conn.commit()
 
             # update all the other rows in ui
@@ -197,7 +228,13 @@ class MyGUI:
             for widget in self.tableFrame.winfo_children():
                 widget.destroy()
 
+            # dialog.destroy()
+
             # adding the new widgets
+            self.populate_the_ui()
+
+            # Reset row count and repopulate the UI from the database
+            self.number_of_rows = 1
             self.populate_the_ui()
             dialog.destroy()
 
