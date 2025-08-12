@@ -2,8 +2,8 @@ import sqlite3
 import tkinter as tk
 from tkinter import messagebox, Label
 
-import os
-print(os.path.abspath("records.db"))
+# import os
+# print(os.path.abspath("records.db"))
 class MyGUI:
     def __init__(self):
         self.root = tk.Tk()
@@ -121,13 +121,13 @@ class MyGUI:
             new_id = cursor.lastrowid
 
             #   display the new record in the UI
-            #  first add the ID
-            id_entry = tk.Label(self.tableFrame, text=new_id,
+            #  adding the ID field
+            id_entry = tk.Label(self.tableFrame, text=new_id-1,
                                 font=('Times New Roman', 12),
                                 borderwidth=1, relief='solid')
             id_entry.grid(row=self.number_of_rows, column=0, padx=1, pady=1, sticky="we")
 
-            # push the info in the ui
+            # pushing the rest info
             for i, entry in enumerate(self.input_fields):
                 value = entry.get()
                 new_entry = tk.Label(self.tableFrame, text=value, font=('Times New Roman', 12), borderwidth=1,
