@@ -1,9 +1,8 @@
 import sqlite3
 import tkinter as tk
 from tkinter import messagebox, Label
+import os
 
-# import os
-# print(os.path.abspath("records.db"))
 class MyGUI:
     def __init__(self):
         self.root = tk.Tk()
@@ -13,7 +12,7 @@ class MyGUI:
         self.centring_the_app()
 
         # connecting code to the database
-        self.conn = sqlite3.connect("E:\Codes\Python\Basic DataBase\ records.db")  # make it so that it can create a new database in the same folder
+        self.conn = sqlite3.connect(os.path.abspath("records.db"))
         cursor = self.conn.cursor()
         cursor.execute(
             '''CREATE TABLE IF NOT EXISTS records
@@ -153,18 +152,6 @@ class MyGUI:
                        ''')
         data = cursor.fetchall()
 
-        # creating 6 columns
-        # for i in range(0, 6):
-        #     self.tableFrame.columnconfigure(i, weight=1)
-
-        # # creating the headings
-        # for column_number, heading_text in enumerate(self.column_headings):
-        #     table_headings = tk.Label(self.tableFrame, text=heading_text, font=('Times New Roman', 16), borderwidth=1,
-        #                               relief='solid')
-        #     table_headings.grid(row=0, column=column_number+1, padx=1, pady=1, sticky="we")
-
-        # self.number_of_rows = 1
-
         # filling the serial number first
         cursor = self.conn.cursor()
         cursor.execute('''
@@ -253,33 +240,6 @@ class MyGUI:
 
             # Show success message
             #messagebox.showinfo("Success", f"Record with ID {id_to_delete} deleted successfully.")
-
-            # creating the column headings
-            # creating 6 columns
-            # for i in range(0, 6):
-            #     self.tableFrame.columnconfigure(i, weight=1)
-
-            # # creating the headings
-            # for column_number, heading_text in enumerate(self.column_headings):
-            #     table_headings = tk.Label(self.tableFrame, text=heading_text, font=('Times New Roman', 16), borderwidth=1,
-            #                               relief='solid')
-            #     table_headings.grid(row=0, column=column_number+1, padx=1, pady=1, sticky="we")
-
-            # self.populate_the_ui()
-            # # Show success message
-            # messagebox.showinfo("Success", f"Record with ID {id_to_delete} deleted successfully.")
-
-
-
-            # dialog.destroy()
-
-            # adding the new widgets
-            #self.populate_the_ui()
-
-            # Reset row count and repopulate the UI from the database
-            # self.number_of_rows = 1
-            # self.populate_the_ui()
-            # dialog.destroy()
 
         def on_cancel():
             dialog.destroy()
